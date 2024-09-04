@@ -80,13 +80,19 @@ async function setupStaticServer() {
     app.get('/', async (req, res) => {
         try {
             const versions = await listVersions();
-            const versionLinks = versions.map(v => `<li><a href="/demo.pos/${v.version}">${v.version}</a></li>`).join('');
+
+            const versionLinks = versions.map(v => {
+                const downloadedText = v.downloaded ? ' (downloaded)' : '';
+                return `<li><a href="/demo.pos/${v.version}" target="_blank" rel="noopener noreferrer">${v.version}</a>${downloadedText}</li>`;
+            }).join('');
+
             res.send(`
-        <h1>Welcome to the Version Manager</h1>
-        <p>Available versions:</p>
-        <ul>${versionLinks}</ul>
-      `);
+            <h1>Welcome to the Version Manager</h1>
+            <p>Available versions:</p>
+            <ul>${versionLinks}</ul>
+        `);
         } catch (error) {
+            console.error('Error in route handler:', error);
             res.status(500).send('Error fetching versions');
         }
     });
